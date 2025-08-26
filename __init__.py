@@ -1,1 +1,1 @@
-from Project_root.handlers import start
+# Bo‘sh fayl, papkani package sifatida tanitadi
