@@ -1,29 +1,19 @@
-# main.py
-from handlers import start, accept_rules, select_date, select_time, handle_survey, save_obraz, admin_panel, admin_text_input
-from keyboards import rules_keyboard, obraz_keyboard, available_dates_keyboard, time_keyboard
-from config import ADMIN_ID, busy_dates, questions
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
+from handlers import start, accept_privacy, accept_rules, select_date, select_time, handle_survey, save_obraz, admin_panel
+from config import BOT_TOKEN
 
-def main():
-    # Botni ishga tushirish
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # Komandalar
-    app.add_handler(CommandHandler("start", start))
+# Handlers
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CallbackQueryHandler(accept_privacy, pattern='^privacy$'))
+app.add_handler(CallbackQueryHandler(accept_rules, pattern='^rules$'))
+app.add_handler(CallbackQueryHandler(select_date, pattern='^select_date$'))
+app.add_handler(CallbackQueryHandler(select_time, pattern='^time_'))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_survey))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, save_obraz))
+app.add_handler(MessageHandler(filters.PHOTO, save_obraz))
+app.add_handler(CallbackQueryHandler(admin_panel, pattern='^(approve|reject)_'))
 
-    # Inline tugmalar
-    app.add_handler(CallbackQueryHandler(accept_rules, pattern="^accept_rules$"))
-    app.add_handler(CallbackQueryHandler(save_obraz, pattern="^obraz_.*$"))
-    app.add_handler(CallbackQueryHandler(admin_panel, pattern="^(approve|reject|edit|addbtn|adddate|vieworders)_.*$"))
-    app.add_handler(CallbackQueryHandler(select_date, pattern="^select_date$"))
-    app.add_handler(CallbackQueryHandler(select_time, pattern="^date_.*$"))
-
-    # Foydalanuvchi matnlari (anketa, ism, belgilar)
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_survey))
-    app.add_handler(MessageHandler(filters.PHOTO, handle_survey))
-
-    print("Bot ishga tushdi...")
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
+print("Bot ishlamoqda...")
+app.run_polling()
