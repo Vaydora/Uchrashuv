@@ -10,6 +10,7 @@ from handlers import (
     select_date,
     select_time
 )
+from keyboards import rules_keyboard, obraz_keyboard, available_dates_keyboard, time_keyboard
 
 def main():
     # Botni ishga tushirish
