@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageH
 from datetime import date, timedelta
 
 # --- CONFIG ---
-BOT_TOKEN = "SIZNING_BOT_TOKENINGIZ"
+BOT_TOKEN = "8493748950:AAFuBvXYDc4H4tA5pWcopl317BtxRlS5aNs"
 ADMIN_ID = 6603473829  # o'zingizning admin ID
 
 # --- BAND KUNLAR ---
