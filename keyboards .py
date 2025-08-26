@@ -3,7 +3,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import date, timedelta
 from config import BUSY_DATES
 
-# -------------------------------
+# ------------------------------- 
 # Qoidalarni qabul qilish tugmasi
 # -------------------------------
 def rules_keyboard():
