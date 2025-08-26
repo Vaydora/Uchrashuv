@@ -1,21 +1,15 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 from datetime import date, timedelta
 
-# ==========================
-# Bot token va admin ID
-# ==========================
-BOT_TOKEN = "8493748950:AAFuBvXYDc4H4tA5pWcopl317BtxRlS5aNs"
-ADMIN_ID = 6603473829
+# =================== CONFIG ===================
+BOT_TOKEN = "SIZNING_BOT_TOKENINGIZ"  # Bu yerga o'zingizning BotFather tokeningizni yozing
+ADMIN_ID = 6603473829  # Sizning telegram IDingiz
 
-# ==========================
-# Band kunlar
-# ==========================
-busy_dates = ["2025-08-27", "2025-08-29"]
+# Band kunlar (misol uchun)
+busy_dates = ["2025-08-27", "2025-08-29"]  # YYYY-MM-DD
 
-# ==========================
 # Anketa savollari
-# ==========================
 questions = [
     "👤 Kimni kutyapsiz?",
     "✍️ Ism:",
@@ -26,9 +20,7 @@ questions = [
     "🎭 Obraz:"
 ]
 
-# ==========================
-# /start
-# ==========================
+# =================== START ===================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = (
         "🌟 *Salom! Men Bob, sizning shaxsiy uchrashuv maslahatchingiz.*\n\n"
@@ -37,13 +29,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("➡️ Davom etish", callback_data='privacy')]]
     await update.message.reply_text(welcome_text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='Markdown')
 
-# ==========================
-# Inline tugmalar
-# ==========================
+# =================== INLINE BUTTONS ===================
 async def user_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
+    # Maxfiylik qoidalari
     if query.data == 'privacy':
         text = "🔒 *Maxfiylik shartnomasi:*\n\n" \
                "1️⃣ Sizning ma'lumotlaringiz sir saqlanadi.\n" \
@@ -53,6 +44,7 @@ async def user_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [[InlineKeyboardButton("✅ Roziman", callback_data='rules')]]
         await query.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='Markdown')
 
+    # Uchrashuv qoidalari
     elif query.data == 'rules':
         text = "📜 *Uchrashuv qoidalari:* \n\n" \
                "1️⃣ Uchrashuv haqida hech kim bilan gaplashmaslik. \n" \
@@ -63,9 +55,14 @@ async def user_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [[InlineKeyboardButton("✅ Qoidalarni qabul qilaman", callback_data='select_date')]]
         await query.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='Markdown')
 
-    elif query.data.startswith('cancel'):
-        await query.edit_message_text("❌ Jarayon bekor qilindi.")
+    # Sanani tanlash
+    elif query.data == 'select_date':
+        keyboard = []
+        for d in get_available_dates():
+            keyboard.append([d])
+        await query.message.reply_text("📅 Iltimos uchrashuv kunini tanlang:", reply_markup=InlineKeyboardMarkup(keyboard))
 
+    # Vaqtni tanlash
     elif query.data.startswith('date_'):
         selected_date = query.data.split('_')[1]
         context.user_data['selected_date'] = selected_date
@@ -83,13 +80,11 @@ async def user_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['q_index'] = 0
         await query.message.reply_text(questions[0])
 
-# ==========================
-# Sanalarni chiqarish
-# ==========================
+# =================== SANALAR ===================
 def get_available_dates():
     today = date.today()
     dates = []
-    for i in range(7):  # keyingi 7 kun
+    for i in range(7):
         day = today + timedelta(days=i)
         if str(day) in busy_dates:
             dates.append(InlineKeyboardButton(f"{day} ❌ Band", callback_data='busy'))
@@ -97,9 +92,7 @@ def get_available_dates():
             dates.append(InlineKeyboardButton(f"{day} ✅ Tanlash", callback_data=f'date_{day}'))
     return dates
 
-# ==========================
-# Anketa savollarini qabul qilish
-# ==========================
+# =================== ANKETA ===================
 async def handle_survey(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'q_index' in context.user_data:
         q_index = context.user_data['q_index']
@@ -113,9 +106,7 @@ async def handle_survey(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("👧 Iltimos, qizning ismini kiriting:")
             context.user_data['ask_name'] = True
 
-# ==========================
-# Qiz ismi va belgisi/rassm
-# ==========================
+# =================== QIZ ISMI VA BELGI/RASM ===================
 async def handle_name_and_sign(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data.get('ask_name'):
         context.user_data['ask_name'] = False
@@ -140,15 +131,12 @@ async def handle_name_and_sign(update: Update, context: ContextTypes.DEFAULT_TYP
         await context.bot.send_message(chat_id=ADMIN_ID, text=msg)
         await update.message.reply_text("✅ Anketa to‘ldirildi va adminga yuborildi.")
 
-# ==========================
-# Admin paneli
-# ==========================
+# =================== ADMIN PANEL ===================
 async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
-    user_id = int(data.split('_')[1])
-
+    user_id = int(data.split('_')[2]) if len(data.split('_')) > 2 else None
     if data.startswith('approve_'):
         await context.bot.send_message(chat_id=user_id, text="✅ Buyurtmangiz tasdiqlandi!")
         await query.edit_message_text("Buyurtma tasdiqlandi.")
@@ -178,25 +166,13 @@ async def admin_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             await update.message.reply_text("❌ Format xato. Iltimos: Tugma nomi | Xabar")
 
-# ==========================
-# Bot ishga tushirish
-# ==========================
+# =================== BOT INIT ===================
 app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-# /start
 app.add_handler(CommandHandler("start", start))
-
-# Inline tugmalar (privacy, rules, date, time, cancel)
-app.add_handler(CallbackQueryHandler(user_buttons, pattern='^(privacy|rules|select_date|date_|time_|cancel)$'))
-
-# Anketa matnini qabul qilish
+app.add_handler(CallbackQueryHandler(user_buttons, pattern='^(privacy|rules|select_date|date_|time_)$'))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_survey))
-
-# Qiz ismi va belgisi/rassm
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_name_and_sign))
 app.add_handler(MessageHandler(filters.PHOTO, handle_name_and_sign))
-
-# Admin paneli
 app.add_handler(CallbackQueryHandler(admin_panel, pattern='^(approve|reject|edit|addbtn)_'))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, admin_text_input))
 
