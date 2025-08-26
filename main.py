@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 from datetime import date, timedelta
 
 # =================== CONFIG ===================
-BOT_TOKEN = "SIZNING_BOT_TOKENINGIZ"  # Bu yerga o'zingizning BotFather tokeningizni yozing
+BOT_TOKEN = "8493748950:AAFuBvXYDc4H4tA5pWcopl317BtxRlS5aNs"  # Bu yerga o'zingizning BotFather tokeningizni yozing
 ADMIN_ID = 6603473829  # Sizning telegram IDingiz
 
 # Band kunlar (misol uchun)
