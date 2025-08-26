@@ -1,31 +1,25 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import date, timedelta
-from config import busy_dates
 
-# Maxfiylik shartnomasi tugmalari
-privacy_keyboard = InlineKeyboardMarkup([
-    [InlineKeyboardButton("✅ Roziman", callback_data='rules')]
-])
+busy_dates = ["2025-08-27", "2025-08-29"]  # Misol uchun band kunlar
 
-# Uchrashuv qoidalari tugmalari
-rules_keyboard = InlineKeyboardMarkup([
-    [InlineKeyboardButton("✅ Qoidalarni qabul qilaman", callback_data='select_date')]
-])
+def rules_keyboard():
+    return InlineKeyboardMarkup([[InlineKeyboardButton("✅ Qoidalarni qabul qilaman", callback_data='select_date')]])
 
-# Vaqt tanlash tugmalari
-time_keyboard = InlineKeyboardMarkup([
-    [InlineKeyboardButton("🕗 20:00 - 21:00", callback_data='time_20')],
-    [InlineKeyboardButton("🕘 21:00 - 22:00", callback_data='time_21')]
-])
+def time_keyboard():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🕗 20:00 - 21:00", callback_data='time_20')],
+        [InlineKeyboardButton("🕘 21:00 - 22:00", callback_data='time_21')]
+    ])
 
-# Sanalarni chiqarish
 def available_dates_keyboard():
     today = date.today()
-    buttons = []
+    keyboard = []
     for i in range(7):
         day = today + timedelta(days=i)
-        if str(day) in busy_dates:
-            buttons.append([InlineKeyboardButton(f"{day} ❌ Band", callback_data='busy')])
+        day_str = str(day)
+        if day_str in busy_dates:
+            keyboard.append([InlineKeyboardButton(f"{day} ❌ Band", callback_data='busy')])
         else:
-            buttons.append([InlineKeyboardButton(f"{day} ✅ Tanlash", callback_data=f'date_{day}')])
-    return InlineKeyboardMarkup(buttons)
+            keyboard.append([InlineKeyboardButton(f"{day} ✅ Tanlash", callback_data=f'date_{day_str}')])
+    return InlineKeyboardMarkup(keyboard)
