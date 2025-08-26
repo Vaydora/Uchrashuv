@@ -182,53 +182,23 @@ async def admin_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Bot ishga tushirish
 # ==========================
 app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+# /start
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(user_buttons, pattern='^(privacy|rules|select_date        context.user_data['ask_name'] = False
-        context.user_data['girl_name'] = update.message.text
-        await update.message.reply_text("🔖 Tanib olish uchun belgini yozing yoki rasm jo‘nating:")
-        context.user_data['ask_sign'] = True
-    elif context.user_data.get('ask_sign'):
-        context.user_data['ask_sign'] = False
-        if update.message.photo:
-            context.user_data['sign'] = "Rasm yuborildi"
-        else:
-            context.user_data['sign'] = update.message.text
 
-        survey_data = context.user_data.get('survey', {})
-        msg = "📝 Yangi buyurtma va anketa:\n"
-        for i, answer in enumerate(survey_data.values()):
-            msg += f"{questions[i]} {answer}\n"
-        msg += f"👧 Qiz ismi: {context.user_data['girl_name']}\n"
-        msg += f"🔖 Tanib olish belgisi / rasm: {context.user_data['sign']}\n"
-        msg += f"📅 Uchrashuv kuni: {context.user_data.get('selected_date')}\n"
-        msg += f"⏰ Vaqti: {context.user_data.get('selected_time')}"
-        await context.bot.send_message(chat_id=ADMIN_ID, text=msg)
-        await update.message.reply_text("✅ Anketa to‘ldirildi va adminga yuborildi.")
+# Inline tugmalar (privacy, rules, date, time, cancel)
+app.add_handler(CallbackQueryHandler(user_buttons, pattern='^(privacy|rules|select_date|date_|time_|cancel)$'))
 
-async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    data = query.data
-    user_id = int(data.split('_')[1])
-    if data.startswith('approve_'):
-        await context.bot.send_message(chat_id=user_id, text="✅ Buyurtmangiz tasdiqlandi!")
-        await query.edit_message_text("Buyurtma tasdiqlandi.")
-    elif data.startswith('reject_'):
-        await context.bot.send_message(chat_id=user_id, text="❌ Buyurtmangiz rad etildi.")
-        await query.edit_message_text("Buyurtma rad etildi.")
-
-# ------------------- MAIN -------------------
-app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(accept_privacy, pattern='^privacy$'))
-app.add_handler(CallbackQueryHandler(accept_rules, pattern='^rules$'))
-app.add_handler(CallbackQueryHandler(select_date, pattern='^select_date$'))
-app.add_handler(CallbackQueryHandler(select_time, pattern='^time_'))
+# Anketa matnini qabul qilish
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_survey))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, save_obraz))
-app.add_handler(MessageHandler(filters.PHOTO, save_obraz))
-app.add_handler(CallbackQueryHandler(admin_panel, pattern='^(approve|reject)_'))
+
+# Qiz ismi va belgisi/rassm
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_name_and_sign))
+app.add_handler(MessageHandler(filters.PHOTO, handle_name_and_sign))
+
+# Admin paneli
+app.add_handler(CallbackQueryHandler(admin_panel, pattern='^(approve|reject|edit|addbtn)_'))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, admin_text_input))
 
 print("Bot ishlamoqda...")
 app.run_polling()
