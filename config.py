@@ -1,13 +1,19 @@
-# config.py
+import os
 
-# Bot tokeningiz (BotFather dan olgan)
-BOT_TOKEN = "8493748950:AAFuBvXYDc4H4tA5pWcopl317BtxRlS5aNs"
+# Bot tokeni va admin ID
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+ADMIN_ID = int(os.environ.get('ADMIN_ID', 0))
 
-# Admin ID (o'zingizning Telegram ID)
-ADMIN_ID = 6603473829
+# Band kunlar
+busy_dates = ["2025-08-27", "2025-08-29"]  # YYYY-MM-DD
 
-# Band sanalar (foydalanuvchilar tanlay olmaydigan kunlar)
-BUSY_DATES = [
-    "2025-08-27",
-    "2025-08-29"
+# Anketa savollari
+questions = [
+    "👤 Kimni kutyapsiz?",
+    "✍️ Ism:",
+    "💼 Kasb:",
+    "🎯 Uchrashuv maqsadi:",
+    "💬 Suhbat mavzulari:",
+    "📍 Manzil:",
+    "🎭 Obraz:"
 ]
