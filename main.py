@@ -1,7 +1,7 @@
 # main.py
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from config import BOT_TOKEN
-from .handlers import (
+from handlers import (
     start,
     accept_rules,
     handle_survey,
