@@ -1,7 +1,7 @@
 # main.py
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from config import BOT_TOKEN
-from handlers import (
+from .handlers import (
     start,
     accept_rules,
     handle_survey,
@@ -10,7 +10,7 @@ from handlers import (
     select_date,
     select_time
 )
-from keyboards import rules_keyboard, obraz_keyboard, available_dates_keyboard, time_keyboard
+from .keyboards import rules_keyboard, obraz_keyboard, available_dates_keyboard, time_keyboard
 
 def main():
     # Botni ishga tushirish
